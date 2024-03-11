@@ -6,10 +6,9 @@ This is a Dockerfile to use [CARLA ROS bridge](https://github.com/carla-simulato
 
 ![](img/carla_ad_demo_with_scenario.png)
 
-Current [carla-simulator/ros-bridge](https://github.com/carla-simulator/ros-bridge) supports to CARLA 0.9.11. So, I used CARLA 0.9.11 in this Dockerfile. And, base image of this Docker file is `nvidia/cudagl:11.4.2-devel-ubuntu18.04`.
-Because, there is the following description in official document(<https://carla.readthedocs.io/en/0.9.13/start_quickstart/>).
+Current [carla-simulator/ros-bridge](https://github.com/carla-simulator/ros-bridge) supports to CARLA 0.9.12. So, I used CARLA 0.9.12 in this Dockerfile. And, base image of this Docker file is `nvidia/cudagl:11.4.2-devel-ubuntu20.04`.
 
-> The Debain package is available for both Ubuntu 18.04 and Ubuntu 20.04, however the officially supported platform is Ubuntu 18.04.
+> **Note**: The Debian package is available for both Ubuntu 18.04 and Ubuntu 20.04, however the officially supported platform is Ubuntu 18.04.
 
 ## Requirements
 
@@ -22,7 +21,7 @@ Because, there is the following description in official document(<https://carla.
 ### Build Docker image
 
 ```shell
-docker build -t carla:0.9.11 --build-arg GID=$(id -g) --build-arg UID=$(id -u) -f Dockerfile.melodic .
+docker build -t carla-ros-bridge:0.9.12-noetic-ubuntu20.04 --build-arg CARLA_VERSION=0.9.12 --build-arg GID=$(id -g) --build-arg UID=$(id -u) --build-arg http_proxy=http://<your ip>:3128 --build-arg https_proxy=http://<your ip>:3128 -f Dockerfile.noetic .
 ```
 
 ### Create Docker container

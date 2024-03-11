@@ -15,6 +15,6 @@ docker run --gpus 0 --privileged --rm -it \
            --env=TERM=xterm-256color \
            --env=QT_X11_NO_MITSHM=1 \
            --net=host \
-           -u "melodic"  \
-           carla:0.9.11 \
+           -u "noetic"  \
+           carla-ros-bridge:0.9.12-noetic-ubuntu20.04 \
            bash
