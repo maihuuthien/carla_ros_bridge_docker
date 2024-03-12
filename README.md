@@ -21,6 +21,25 @@ Current [carla-simulator/ros-bridge](https://github.com/carla-simulator/ros-brid
 ### Build Docker image
 
 ```shell
+docker build -t carla-ros-bridge:0.9.12-noetic-ubuntu20.04 --build-arg CARLA_VERSION=0.9.12 --build-arg GID=$(id -g) --build-arg UID=$(id -u) -f Dockerfile.noetic .
+```
+
+#### On Windows behind Corporate Proxy
+
+The trickiest part is to make `rosdep init` and `rosdep update` work, since they don't accept any argument for proxy. After many trials and errors with `docker build` options like `--network` and `--add-host`, even resorting to desperate measure of setting up a local HTTP server for pre-downloaded files from [20-default.list](https://raw.github.com/ros/rosdistro/master/rosdep/sources.list.d/20-default.list), I finally arrived at a solution, [Px proxy server](https://github.com/genotrance/px). Here's my [px.ini](https://github.com/genotrance/px/blob/master/px.ini) settings:
+
+```
+[proxy]
+server = <your corporate proxy>
+port = 3128
+hostonly = 1
+username = <your domain>\<your username>
+...
+```
+
+Start your Px server, then build the docker image:
+
+```shell
 docker build -t carla-ros-bridge:0.9.12-noetic-ubuntu20.04 --build-arg CARLA_VERSION=0.9.12 --build-arg GID=$(id -g) --build-arg UID=$(id -u) --build-arg http_proxy=http://<your ip>:3128 --build-arg https_proxy=http://<your ip>:3128 -f Dockerfile.noetic .
 ```
 
