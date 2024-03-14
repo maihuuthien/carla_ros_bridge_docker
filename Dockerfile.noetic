@@ -1,4 +1,4 @@
-FROM nvidia/cudagl:11.4.2-devel-ubuntu20.04
+FROM nvidia/cuda:11.6.1-cudnn8-devel-ubuntu20.04
 
 ARG CARLA_VERSION=0.9.12
 ARG ROS_BRIDGE_VERSION=${CARLA_VERSION}
@@ -19,33 +19,48 @@ RUN useradd -m $USERNAME -u ${UID} -g ${GID} && \
     echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME && \
     chmod 0440 /etc/sudoers.d/$USERNAME
 
+# install package
+RUN echo "Acquire::GzipIndexes \"false\"; Acquire::CompressionTypes::Order:: \"gz\";" > /etc/apt/apt.conf.d/docker-gzip-indexes
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
     less \
     emacs \
     tmux \
+    curl \
     wget \
-    git-all \
+    git \
     bash-completion \
     command-not-found \
     software-properties-common \
     xsel \
+    coreutils \
+    build-essential \
+    pkg-config \
     xdg-user-dirs \
     python3-pip \
     python3-protobuf \
     python3-pexpect \
     pcl-tools \
     libomp5 \
+    libgl1-mesa-dev \
+    freeglut3-dev \
+    mesa-utils \
+    vulkan-tools \
     vulkan-utils \
+    libvulkan-dev \
+    libglfw3-dev \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Vulkan
-RUN mkdir -p /etc/vulkan/icd.d && \
-    echo '{ "file_format_version" : "1.0.0", "ICD" : { "library_path" : "libGLX_nvidia.so.0", "api_version" : "1.1.99" } }' > /etc/vulkan/icd.d/nvidia_icd.json
-RUN echo > /etc/ld.so.preload
+COPY config/nvidia_icd.json /usr/share/vulkan/icd.d/
+
+ARG XDG_RUNTIME_DIR="/tmp/xdg_runtime_dir"
+RUN mkdir -p ${XDG_RUNTIME_DIR} && chmod 777 ${XDG_RUNTIME_DIR}
+
+RUN echo "export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json" >> ~/.bashrc
+RUN echo "export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}" >> ~/.bashrc
 
 # ROS Noetic
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
@@ -88,6 +103,10 @@ RUN mkdir /opt/carla-simulator && \
 # RUN sudo pip install /opt/carla-simulator/PythonAPI/carla/dist/carla-${CARLA_VERSION}-cp37-cp37m-manylinux_2_27_x86_64.whl
 ENV PYTHONPATH ${PYTHONPATH}:"/opt/carla-simulator/PythonAPI/carla/dist/carla-${CARLA_VERSION}-py3.7-linux-x86_64.egg"
 
+# Select the video driver between offsreen and x11
+# x11 is recommended for vulkan support
+ENV SDL_VIDEODRIVER=x11
+
 RUN sudo pip install --proxy=${HTTP_PROXY} --no-cache-dir -r /opt/carla-simulator/PythonAPI/examples/requirements.txt
 
 # addtional ROS package
@@ -107,7 +126,7 @@ RUN sudo pip install --proxy=${HTTP_PROXY} \
 RUN sudo -E rosdep init
 
 USER $USERNAME
-WORKDIR /home/$USERNAME
+WORKDIR $HOME
 
 RUN sudo rosdep fix-permissions
 RUN rosdep update
@@ -133,7 +152,7 @@ RUN mkdir -p ~/catkin_ws/src && \
     source ~/catkin_ws/devel/setup.bash
 
 # build CARLA ScenarioRunner
-RUN cd /home/$USERNAME && \
+RUN cd $HOME && \
     wget --no-check-certificate https://github.com/carla-simulator/scenario_runner/archive/refs/tags/v${CARLA_VERSION}.tar.gz && \
     tar -xzvf v${CARLA_VERSION}.tar.gz && \
     rm -f v${CARLA_VERSION}.tar.gz && \
@@ -142,4 +161,4 @@ RUN cd /home/$USERNAME && \
 
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc && \
     echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc && \
-    echo "export SCENARIO_RUNNER_PATH=/home/$USERNAME/scenario_runner" >> ~/.bashrc
+    echo "export SCENARIO_RUNNER_PATH=$HOME/scenario_runner" >> ~/.bashrc

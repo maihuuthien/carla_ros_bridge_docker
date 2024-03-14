@@ -6,7 +6,7 @@ This is a Dockerfile to use [CARLA ROS bridge](https://github.com/carla-simulato
 
 ![](img/carla_ad_demo_with_scenario.png)
 
-Current [carla-simulator/ros-bridge](https://github.com/carla-simulator/ros-bridge) supports to CARLA 0.9.12. So, I used CARLA 0.9.12 in this Dockerfile. And, base image of this Docker file is `nvidia/cudagl:11.4.2-devel-ubuntu20.04`.
+Current [carla-simulator/ros-bridge](https://github.com/carla-simulator/ros-bridge) supports to CARLA 0.9.12. So, I used CARLA 0.9.12 in this Dockerfile. And, base image of this Docker file is `nvidia/cuda:11.6.1-cudnn8-devel-ubuntu20.04`.
 
 > **Note**: The Debian package is available for both Ubuntu 18.04 and Ubuntu 20.04, however the officially supported platform is Ubuntu 18.04.
 
