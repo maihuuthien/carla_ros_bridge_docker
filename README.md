@@ -20,8 +20,10 @@ Current [carla-simulator/ros-bridge](https://github.com/carla-simulator/ros-brid
 
 ### Build Docker image
 
+#### On Ubuntu20.04
+
 ```shell
-docker build -t carla-ros-bridge:0.9.12-noetic-ubuntu20.04 --build-arg CARLA_VERSION=0.9.12 --build-arg GID=$(id -g) --build-arg UID=$(id -u) -f Dockerfile.noetic .
+docker build -t carla-ros-bridge:0.9.12-noetic --build-arg GID=$(id -g) --build-arg UID=$(id -u) -f Dockerfile.noetic .
 ```
 
 #### On Windows behind Corporate Proxy
@@ -40,7 +42,7 @@ username = <your domain>\<your username>
 Start your Px server, then build the docker image:
 
 ```shell
-docker build -t carla-ros-bridge:0.9.12-noetic-ubuntu20.04 --build-arg CARLA_VERSION=0.9.12 --build-arg GID=$(id -g) --build-arg UID=$(id -u) --build-arg http_proxy=http://<your ip>:3128 --build-arg https_proxy=http://<your ip>:3128 -f Dockerfile.noetic .
+docker build -t carla-ros-bridge:0.9.12-noetic --build-arg GID=$(id -g) --build-arg UID=$(id -u) --build-arg http_proxy=http://<your ip>:3128 --build-arg https_proxy=http://<your ip>:3128 -f Dockerfile.noetic .
 ```
 
 ### Create Docker container

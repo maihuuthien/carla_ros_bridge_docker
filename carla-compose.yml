@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+    simulator:
+        image: carla-ros-bridge:0.9.12-noetic
+        logging:
+          options:
+            max-size: "10m"
+            max-file: "3"
+        privileged: true
+        environment:
+            SDL_VIDEODRIVER: x11
+            DISPLAY: $DISPLAY
+        ports:
+            - "2000:2000"
+            - "2001:2001"
+            - "2002:2002"
+        command: /opt/carla-simulator/CarlaUE4.sh -quality-level=Low -carla-rpc-port=2000
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix:rw
+            - /etc/localtime:/etc/localtime
+            - /etc/timezone:/etc/timezone
+            - /usr/share/vulkan/icd.d:/usr/share/vulkan/icd.d
+        restart: always
+        deploy:
+          resources:
+            reservations:
+              devices:
+                - driver: nvidia
+                  count: "all"
+                  capabilities: [compute,utility,graphics,display]

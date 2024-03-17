@@ -4,6 +4,7 @@ ARG CARLA_VERSION=0.9.12
 ARG ROS_BRIDGE_VERSION=${CARLA_VERSION}
 ARG GID=1000
 ARG UID=1000
+
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
@@ -123,13 +124,12 @@ RUN sudo pip install --proxy=${HTTP_PROXY} \
     networkx==2.2 \
     pygame==2.5.2
 
-RUN sudo -E rosdep init
-
 USER $USERNAME
 WORKDIR $HOME
 
-RUN sudo rosdep fix-permissions
-RUN rosdep update
+RUN sudo -E rosdep init
+RUN sudo rosdep fix-permissions && rosdep update
+RUN sudo chown $USERNAME:$USERNAME /opt/carla-simulator/CarlaUE4/Binaries/Linux/CarlaUE4-Linux-Shipping
 
 SHELL ["/bin/bash", "-c"]
 
